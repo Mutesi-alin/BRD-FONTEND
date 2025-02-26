@@ -14,8 +14,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Mutesi Aline Portfolio",
-  description: "As a Software Developer actively seeking opportunities in the tech industry, this is my personal website that showcases my latest projects, technical skills, and professional journey.",
+  title: "NNM FOREX TRADING LTD",
+  description: ".",
 };
 
 export default function RootLayout({
