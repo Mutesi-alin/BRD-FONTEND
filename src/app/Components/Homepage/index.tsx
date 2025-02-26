@@ -128,9 +128,9 @@ const Homepage = () => {
             {/* Text Content - 3 columns */}
             <div className={`md:col-span-3 transition-all duration-1000 ${animateHero ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}`}>
               <div className="text-white bg-black bg-opacity-30 backdrop-filter backdrop-blur-lg p-10 rounded-lg border border-white border-opacity-10">
-                <h1 className="text-5xl font-bold mb-6 leading-tight">
-                  Rwanda's Leading <span className="text-green-400">Forex Trading</span> Partner
-                </h1>
+              <h1 className="text-5xl font-bold mb-6 leading-tight">
+  Rwanda&apos;s Leading <span className="text-green-400">Forex Trading</span> Partner
+</h1>
                 <p className="text-lg mb-8 leading-relaxed">
                   Over 10 years of excellence in foreign currency exchange. Regulated by the National Bank of Rwanda and a proud member of Rwanda Forex Bureau Association.
                 </p>
@@ -348,14 +348,14 @@ const Homepage = () => {
               </div>
               <h3 className="text-2xl font-semibold mb-4">Our Mission</h3>
               <p className="text-lg leading-relaxed">
-                To provide <span className="font-medium">efficient, transparent, and reliable</span> foreign exchange services that meet the diverse needs of our customers while contributing to Rwanda's economic growth through ethical business practices and exceptional customer service.
-              </p>
+  To provide <span className="font-medium">efficient, transparent, and reliable</span> foreign exchange services that meet the diverse needs of our customers while contributing to Rwanda&#39;s economic growth through ethical business practices and exceptional customer service.
+</p>
               
               <div className="mt-8 pt-6 border-t border-white border-opacity-20">
                 <div className="flex items-center text-white text-opacity-80">
                   <Globe className="h-5 w-5 mr-2" />
-                  <span>Serving Rwanda's economy since 2013</span>
-                </div>
+                  <span>Serving Rwanda&#39;s economy since 2013</span>
+                  </div>
               </div>
             </div>
           </div>
@@ -567,7 +567,7 @@ const Homepage = () => {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold text-gray-800 mb-6">Ready to Exchange Currency?</h2>
           <p className="text-gray-600 mb-8 text-lg">
-            Visit our office for the best rates or contact us to learn more about our services. We&apos;re committed to providing you with a seamless foreign exchange experience.
+            Visit our office for the best rates or contact us to learn more about our services. We&apos;re committed to providing you with a seamless foreign exchange experience..
           </p>
           <button className="bg-green-500 text-white px-10 py-4 rounded-md font-medium text-lg shadow-md transition duration-300 ease-in-out transform hover:bg-green-600 hover:shadow-lg hover:-translate-y-1">
             GET CURRENT RATES
@@ -606,7 +606,7 @@ const Homepage = () => {
               <ul className="space-y-2">
                 <li className="text-gray-400">123 KICUKIRO Street</li>
                 <li className="text-gray-400">Kigali,Rwanda 10001</li>
-                <li className="text-gray-400">+250788350686SS</li>
+                <li className="text-gray-400">+250788350686</li>
                 <li className="text-gray-400">info@nnmforex.com</li>
               </ul>
             </div>
