@@ -1,12 +1,13 @@
-// import Image from "next/image";
-import Homepage from "./Components/Homepage";
-
+import React from "react";
+import Dashboard from "./dashboard/page";
+import Landinpage from "./landingpage/page"
+import { LogIn } from "lucide-react";
+import Login from "./login/page";
 
 export default function Home() {
   return (
     <div>
-     <Homepage/>
-     
+      <Landinpage />
     </div>
   );
 }
