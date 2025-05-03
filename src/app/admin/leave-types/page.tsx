@@ -3,12 +3,26 @@
 import { useState, useEffect } from 'react';
 import { PlusCircle, Edit, Trash2, Save, X } from 'lucide-react';
 
+// Define the LeaveType interface
+interface LeaveType {
+  id: number;
+  name: string;
+  description: string;
+  defaultBalance: number;
+  accrualRate: string;
+  accrualAmount: number;
+  carryoverLimit: number;
+  carryoverExpiry: number;
+  color: string;
+}
+
 export default function LeaveTypesPage() {
-  const [leaveTypes, setLeaveTypes] = useState([]);
+  // Specify the type for the state
+  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
   
-  const [newLeaveType, setNewLeaveType] = useState({
+  const [newLeaveType, setNewLeaveType] = useState<Omit<LeaveType, 'id'>>({
     name: '',
     description: '',
     defaultBalance: 0,
@@ -25,7 +39,7 @@ export default function LeaveTypesPage() {
     
     // If no leave types exist, create some defaults
     if (storedLeaveTypes.length === 0) {
-      const defaultLeaveTypes = [
+      const defaultLeaveTypes: LeaveType[] = [
         {
           id: 1,
           name: 'Annual Leave',
@@ -84,7 +98,7 @@ export default function LeaveTypesPage() {
       ? Math.max(...leaveTypes.map(type => type.id)) + 1 
       : 1;
       
-    const leaveTypeToAdd = {
+    const leaveTypeToAdd: LeaveType = {
       ...newLeaveType,
       id: newId
     };
@@ -107,11 +121,11 @@ export default function LeaveTypesPage() {
     setIsAddingNew(false);
   };
 
-  const handleEdit = (id) => {
+  const handleEdit = (id: number) => {
     setEditingId(id);
   };
 
-  const handleSaveEdit = (id) => {
+  const handleSaveEdit = (id: number) => {
     const updatedLeaveTypes = leaveTypes.map(type => {
       if (type.id === id) {
         return { ...type };
@@ -124,7 +138,7 @@ export default function LeaveTypesPage() {
     setEditingId(null);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this leave type? This may affect existing leave balances.')) {
       const updatedLeaveTypes = leaveTypes.filter(type => type.id !== id);
       setLeaveTypes(updatedLeaveTypes);
@@ -132,7 +146,7 @@ export default function LeaveTypesPage() {
     }
   };
 
-  const handleInputChange = (id, field, value) => {
+  const handleInputChange = (id: number, field: keyof LeaveType, value: string | number) => {
     const updatedLeaveTypes = leaveTypes.map(type => {
       if (type.id === id) {
         return { ...type, [field]: value };
@@ -143,7 +157,7 @@ export default function LeaveTypesPage() {
     setLeaveTypes(updatedLeaveTypes);
   };
 
-  const handleNewLeaveTypeChange = (field, value) => {
+  const handleNewLeaveTypeChange = (field: keyof Omit<LeaveType, 'id'>, value: string | number) => {
     setNewLeaveType({
       ...newLeaveType,
       [field]: value

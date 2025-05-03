@@ -5,15 +5,44 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
-import {
-  Download, Filter, BarChart2, PieChart as PieChartIcon, Calendar
-} from 'lucide-react';
+import { Download } from 'lucide-react'; // Cleaned unused icons
+
+// Define types for our data structures
+interface Employee {
+  id: string;
+  name: string;
+  department: string;
+  // Add other employee properties as needed
+}
+
+interface LeaveType {
+  id: string;
+  name: string;
+  // Add other leave type properties as needed
+}
+
+interface LeaveRequest {
+  id?: string;
+  employee: string | Employee;
+  type: string | LeaveType;
+  startDate: string;
+  endDate: string;
+  // Add other leave request properties as needed
+}
+
+interface LeaveBalance {
+  id?: string;
+  employeeId: string;
+  leaveTypeId?: string;
+  remaining: number;
+  // Add other leave balance properties as needed
+}
 
 export default function ReportsPage() {
-  const [employees, setEmployees] = useState([]);
-  const [leaveTypes, setLeaveTypes] = useState([]);
-  const [leaveRequests, setLeaveRequests] = useState([]);
-  const [leaveBalances, setLeaveBalances] = useState([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
+  const [leaveBalances, setLeaveBalances] = useState<LeaveBalance[]>([]);
   const [reportType, setReportType] = useState('usage');
   const [filterDepartment, setFilterDepartment] = useState('all');
   const [filterLeaveType, setFilterLeaveType] = useState('all');
@@ -25,221 +54,142 @@ export default function ReportsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load data from localStorage
-    try {
-      const storedEmployees = JSON.parse(localStorage.getItem('employees') || '[]');
-      const storedLeaveTypes = JSON.parse(localStorage.getItem('leaveTypes') || '[]');
-      const storedLeaveRequests = JSON.parse(localStorage.getItem('leaveRequests') || '[]');
-      const storedLeaveBalances = JSON.parse(localStorage.getItem('leaveBalances') || '[]');
+    const storedEmployees = JSON.parse(localStorage.getItem('employees') || '[]');
+    const storedLeaveTypes = JSON.parse(localStorage.getItem('leaveTypes') || '[]');
+    const storedLeaveRequests = JSON.parse(localStorage.getItem('leaveRequests') || '[]');
+    const storedLeaveBalances = JSON.parse(localStorage.getItem('leaveBalances') || '[]');
 
-      setEmployees(storedEmployees);
-      setLeaveTypes(storedLeaveTypes);
-      setLeaveRequests(storedLeaveRequests);
-      setLeaveBalances(storedLeaveBalances);
-    } catch (error) {
-      console.error("Error loading data from localStorage:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    setEmployees(storedEmployees);
+    setLeaveTypes(storedLeaveTypes);
+    setLeaveRequests(storedLeaveRequests);
+    setLeaveBalances(storedLeaveBalances);
+    setIsLoading(false);
   }, []);
 
-  const departments = Array.from(new Set(employees.map(employee => employee.department).filter(Boolean)));
+  const departments = Array.from(new Set(employees.map(employee => employee.department)));
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ff6b6b', '#6b88ff'];
 
-  const getEmployeeName = (employeeId) => {
-    // Handle both ID and direct name cases
-    if (!employeeId) return 'Unknown';
-    
-    if (typeof employeeId === 'string' && !employeeId.match(/^[0-9a-f-]+$/i)) {
-      return employeeId; // Already a name
-    }
-    
-    const employee = employees.find(e => e.id === employeeId);
-    return employee ? employee.name : 'Unknown';
+  const getEmployeeName = (employeeId: string | Employee): string => {
+    if (typeof employeeId === 'string') return employeeId;
+    return employeeId?.name || 'Unknown';
   };
 
-  const getLeaveTypeName = (leaveTypeId) => {
-    // Handle both ID and direct name cases
-    if (!leaveTypeId) return 'Unknown';
-    
-    if (typeof leaveTypeId === 'string' && !leaveTypeId.match(/^[0-9a-f-]+$/i)) {
-      return leaveTypeId; // Already a name
-    }
-    
-    const leaveType = leaveTypes.find(t => t.id === leaveTypeId);
-    return leaveType ? leaveType.name : 'Unknown';
+  const getLeaveTypeName = (leaveTypeId: string | LeaveType): string => {
+    if (typeof leaveTypeId === 'string') return leaveTypeId;
+    return leaveTypeId?.name || 'Unknown';
   };
 
-  const getEmployeeDepartment = (employeeId) => {
-    // Handle both ID and name cases
-    if (!employeeId) return 'Unknown';
-    
-    // If it's a name, find by name
-    if (typeof employeeId === 'string' && !employeeId.match(/^[0-9a-f-]+$/i)) {
+  const getEmployeeDepartment = (employeeId: string | Employee): string => {
+    if (typeof employeeId === 'string') {
       const employee = employees.find(e => e.name === employeeId);
       return employee ? employee.department : 'Unknown';
     }
-    
-    // Otherwise find by ID
-    const employee = employees.find(e => e.id === employeeId);
-    return employee ? employee.department : 'Unknown';
-  };
-
-  const calculateDateDifference = (startDate, endDate) => {
-    // Ensure we have valid dates
-    if (!startDate || !endDate) return 0;
-    
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    
-    // Check for invalid dates
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
-    
-    // Calculate difference in days
-    return Math.max(0, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
+    return employeeId?.department || 'Unknown';
   };
 
   const filteredLeaveRequests = leaveRequests.filter(request => {
-    // Skip invalid requests
-    if (!request || !request.startDate || !request.endDate) return false;
-    
-    try {
-      const requestStartDate = new Date(request.startDate);
-      const requestEndDate = new Date(request.endDate);
-      const filterStartDate = new Date(dateRange.start);
-      const filterEndDate = new Date(dateRange.end);
-      
-      // Check for invalid dates
-      if (isNaN(requestStartDate.getTime()) || isNaN(requestEndDate.getTime()) ||
-          isNaN(filterStartDate.getTime()) || isNaN(filterEndDate.getTime())) {
-        return false;
-      }
+    const requestStartDate = new Date(request.startDate);
+    const requestEndDate = new Date(request.endDate);
+    const filterStartDate = new Date(dateRange.start);
+    const filterEndDate = new Date(dateRange.end);
 
-      // Date range filter
-      if (requestEndDate < filterStartDate || requestStartDate > filterEndDate) {
-        return false;
-      }
-
-      // Department filter
-      if (filterDepartment !== 'all') {
-        const employeeDepartment = getEmployeeDepartment(request.employee);
-        if (employeeDepartment !== filterDepartment) {
-          return false;
-        }
-      }
-
-      // Leave type filter
-      if (filterLeaveType !== 'all') {
-        const leaveTypeName = getLeaveTypeName(request.type);
-        if (leaveTypeName !== filterLeaveType) {
-          return false;
-        }
-      }
-
-      // Employee filter
-      if (filterEmployee !== 'all') {
-        const employeeName = getEmployeeName(request.employee);
-        if (employeeName !== filterEmployee) {
-          return false;
-        }
-      }
-
-      return true;
-    } catch (error) {
-      console.error("Error filtering leave request:", error, request);
+    if (requestEndDate < filterStartDate || requestStartDate > filterEndDate) {
       return false;
     }
+
+    if (filterDepartment !== 'all') {
+      const employeeDepartment = getEmployeeDepartment(request.employee);
+      if (employeeDepartment !== filterDepartment) {
+        return false;
+      }
+    }
+
+    if (filterLeaveType !== 'all') {
+      const leaveTypeName = getLeaveTypeName(request.type);
+      if (leaveTypeName !== filterLeaveType) {
+        return false;
+      }
+    }
+
+    if (filterEmployee !== 'all') {
+      const employeeName = getEmployeeName(request.employee);
+      if (employeeName !== filterEmployee) {
+        return false;
+      }
+    }
+
+    return true;
   });
 
   const generateReportData = () => {
-    try {
-      if (reportType === 'usage') {
-        const leaveTypeUsage = {};
-        filteredLeaveRequests.forEach(request => {
-          const leaveTypeName = getLeaveTypeName(request.type);
-          const daysCount = calculateDateDifference(request.startDate, request.endDate);
-          
-          leaveTypeUsage[leaveTypeName] = (leaveTypeUsage[leaveTypeName] || 0) + daysCount;
-        });
-        return Object.entries(leaveTypeUsage).map(([name, value]) => ({ name, value }));
-      }
+    if (reportType === 'usage') {
+      const leaveTypeUsage: Record<string, number> = {};
+      filteredLeaveRequests.forEach(request => {
+        const leaveTypeName = getLeaveTypeName(request.type);
+        const startDate = new Date(request.startDate);
+        const endDate = new Date(request.endDate);
+        const daysCount = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
-      if (reportType === 'departmentUsage') {
-        const departmentUsage = {};
-        filteredLeaveRequests.forEach(request => {
-          const department = getEmployeeDepartment(request.employee);
-          const daysCount = calculateDateDifference(request.startDate, request.endDate);
-          
-          departmentUsage[department] = (departmentUsage[department] || 0) + daysCount;
-        });
-        return Object.entries(departmentUsage).map(([name, value]) => ({ name, value }));
-      }
+        leaveTypeUsage[leaveTypeName] = (leaveTypeUsage[leaveTypeName] || 0) + daysCount;
+      });
+      return Object.entries(leaveTypeUsage).map(([name, value]) => ({ name, value }));
+    }
 
-      if (reportType === 'employeeUsage') {
-        const employeeUsage = {};
-        filteredLeaveRequests.forEach(request => {
-          const name = getEmployeeName(request.employee);
-          const daysCount = calculateDateDifference(request.startDate, request.endDate);
-          
-          employeeUsage[name] = (employeeUsage[name] || 0) + daysCount;
-        });
-        return Object.entries(employeeUsage)
-          .map(([name, value]) => ({ name, value }))
-          .sort((a, b) => b.value - a.value)
-          .slice(0, 10);
-      }
+    if (reportType === 'departmentUsage') {
+      const departmentUsage: Record<string, number> = {};
+      filteredLeaveRequests.forEach(request => {
+        const department = getEmployeeDepartment(request.employee);
+        const startDate = new Date(request.startDate);
+        const endDate = new Date(request.endDate);
+        const daysCount = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        departmentUsage[department] = (departmentUsage[department] || 0) + daysCount;
+      });
+      return Object.entries(departmentUsage).map(([name, value]) => ({ name, value }));
+    }
 
-      if (reportType === 'monthlyTrend') {
-        const monthlyData = Array(12).fill().map((_, i) => ({
-          name: new Date(2000, i).toLocaleString('default', { month: 'short' }),
-          value: 0,
-          month: i
-        }));
+    if (reportType === 'employeeUsage') {
+      const employeeUsage: Record<string, number> = {};
+      filteredLeaveRequests.forEach(request => {
+        const name = getEmployeeName(request.employee);
+        const startDate = new Date(request.startDate);
+        const endDate = new Date(request.endDate);
+        const daysCount = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        employeeUsage[name] = (employeeUsage[name] || 0) + daysCount;
+      });
+      return Object.entries(employeeUsage).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value).slice(0, 10);
+    }
 
-        filteredLeaveRequests.forEach(request => {
-          try {
-            const startDate = new Date(request.startDate);
-            const endDate = new Date(request.endDate);
-            
-            // Skip invalid dates
-            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return;
-            
-            // Count days in each month
-            let current = new Date(startDate);
-            while (current <= endDate) {
-              monthlyData[current.getMonth()].value += 1;
-              current.setDate(current.getDate() + 1);
-            }
-          } catch (error) {
-            console.error("Error processing request for monthly trend:", error);
+    if (reportType === 'monthlyTrend') {
+      const monthlyData = Array(12).fill(null).map((_, i) => ({
+        name: new Date(0, i).toLocaleString('default', { month: 'short' }),
+        value: 0,
+        month: i
+      }));
+
+      filteredLeaveRequests.forEach(request => {
+        const startDate = new Date(request.startDate);
+        const endDate = new Date(request.endDate);
+        const current = new Date(startDate);
+        while (current <= endDate) {
+          monthlyData[current.getMonth()].value += 1;
+          current.setDate(current.getDate() + 1);
+        }
+      });
+
+      return monthlyData;
+    }
+
+    if (reportType === 'balances') {
+      const employeeBalances: Record<string, number> = {};
+      employees.forEach(emp => {
+        employeeBalances[emp.name] = 0;
+        leaveBalances.forEach(balance => {
+          if (balance.employeeId === emp.id) {
+            employeeBalances[emp.name] += balance.remaining;
           }
         });
-
-        return monthlyData;
-      }
-
-      if (reportType === 'balances') {
-        const employeeBalances = {};
-        
-        employees.forEach(emp => {
-          if (!emp || !emp.id || !emp.name) return;
-          
-          employeeBalances[emp.name] = 0;
-          
-          leaveBalances.forEach(balance => {
-            if (balance && balance.employeeId === emp.id) {
-              const remaining = Number(balance.remaining) || 0;
-              employeeBalances[emp.name] += remaining;
-            }
-          });
-        });
-        
-        return Object.entries(employeeBalances)
-          .map(([name, value]) => ({ name, value }))
-          .sort((a, b) => b.value - a.value);
-      }
-    } catch (error) {
-      console.error("Error generating report data:", error);
+      });
+      return Object.entries(employeeBalances).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
     }
 
     return [];
@@ -248,22 +198,16 @@ export default function ReportsPage() {
   const reportData = generateReportData();
 
   const exportToCsv = () => {
-    try {
-      const headers = reportType === 'monthlyTrend' ? 'Month,Days\n' : 'Name,Days\n';
-      const csvData = reportData.map(item => `${item.name},${item.value}`).join('\n');
-      const blob = new Blob([headers + csvData], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `leave-report-${reportType}-${new Date().toISOString().slice(0, 10)}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url); // Clean up to avoid memory leaks
-    } catch (error) {
-      console.error("Error exporting CSV:", error);
-      alert("Failed to export data. Please try again.");
-    }
+    const headers = reportType === 'monthlyTrend' ? 'Month,Days\n' : 'Name,Days\n';
+    const csvData = reportData.map(item => `${item.name},${item.value}`).join('\n');
+    const blob = new Blob([headers + csvData], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `leave-report-${reportType}-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   if (isLoading) {
@@ -287,58 +231,30 @@ export default function ReportsPage() {
       </div>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <select 
-          value={filterDepartment} 
-          onChange={e => setFilterDepartment(e.target.value)} 
-          className="border rounded px-3 py-2"
-        >
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <select value={filterDepartment} onChange={e => setFilterDepartment(e.target.value)} className="border rounded px-3 py-2">
           <option value="all">All Departments</option>
-          {departments.map(dept => (
-            <option key={dept} value={dept}>{dept}</option>
-          ))}
+          {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
         </select>
 
-        <select 
-          value={filterLeaveType} 
-          onChange={e => setFilterLeaveType(e.target.value)} 
-          className="border rounded px-3 py-2"
-        >
+        <select value={filterLeaveType} onChange={e => setFilterLeaveType(e.target.value)} className="border rounded px-3 py-2">
           <option value="all">All Leave Types</option>
-          {leaveTypes.map(type => (
-            <option key={type.id} value={type.name}>{type.name}</option>
-          ))}
+          {leaveTypes.map(type => <option key={type.id} value={type.name}>{type.name}</option>)}
         </select>
 
-        <select 
-          value={filterEmployee} 
-          onChange={e => setFilterEmployee(e.target.value)} 
-          className="border rounded px-3 py-2"
-        >
+        <select value={filterEmployee} onChange={e => setFilterEmployee(e.target.value)} className="border rounded px-3 py-2">
           <option value="all">All Employees</option>
-          {employees.map(emp => (
-            <option key={emp.id} value={emp.name}>{emp.name}</option>
-          ))}
+          {employees.map(emp => <option key={emp.id} value={emp.name}>{emp.name}</option>)}
         </select>
 
         <div className="flex gap-2">
-          <input 
-            type="date" 
-            value={dateRange.start} 
-            onChange={e => setDateRange({ ...dateRange, start: e.target.value })} 
-            className="border rounded px-2 w-full"
-          />
-          <input 
-            type="date" 
-            value={dateRange.end} 
-            onChange={e => setDateRange({ ...dateRange, end: e.target.value })} 
-            className="border rounded px-2 w-full"
-          />
+          <input type="date" value={dateRange.start} onChange={e => setDateRange({ ...dateRange, start: e.target.value })} className="border rounded px-2" />
+          <input type="date" value={dateRange.end} onChange={e => setDateRange({ ...dateRange, end: e.target.value })} className="border rounded px-2" />
         </div>
       </div>
 
       {/* Report type selector */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex gap-4">
         {[
           { id: 'usage', label: 'Leave Type Usage' },
           { id: 'departmentUsage', label: 'Department Usage' },
@@ -357,43 +273,29 @@ export default function ReportsPage() {
       </div>
 
       {/* Chart display */}
-      <div className="w-full h-[400px] border rounded p-4">
-        {reportData.length > 0 ? (
-          <ResponsiveContainer>
-            {reportType === 'monthlyTrend' || reportType === 'employeeUsage' || reportType === 'balances' ? (
-              <BarChart data={reportData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="value" fill="#8884d8" name="Days" />
-              </BarChart>
-            ) : (
-              <PieChart>
-                <Pie 
-                  data={reportData} 
-                  dataKey="value" 
-                  nameKey="name" 
-                  cx="50%" 
-                  cy="50%" 
-                  outerRadius={120}
-                  label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                >
-                  {reportData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => [`${value} days`, 'Usage']} />
-                <Legend />
-              </PieChart>
-            )}
-          </ResponsiveContainer>
-        ) : (
-          <div className="flex justify-center items-center h-full">
-            <p className="text-gray-500">No data available for the selected filters</p>
-          </div>
-        )}
+      <div className="w-full h-[400px]">
+        <ResponsiveContainer>
+          {reportType === 'monthlyTrend' || reportType === 'employeeUsage' || reportType === 'balances' ? (
+            <BarChart data={reportData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="value" fill="#8884d8" />
+            </BarChart>
+          ) : (
+            <PieChart>
+              <Pie data={reportData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120}>
+                {reportData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          )}
+        </ResponsiveContainer>
       </div>
     </div>
   );

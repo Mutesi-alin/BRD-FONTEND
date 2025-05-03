@@ -16,7 +16,7 @@ export default function SignupPage() {
 
     const users = JSON.parse(localStorage.getItem('users') || '[]');
 
-    if (users.some((u: any) => u.email === email)) {
+    if (users.some((u: { email: string }) => u.email === email)) {
       setError('User with this email already exists');
       return;
     }

@@ -4,17 +4,38 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight, Filter, Download, Users } from 'lucide-react';
 
+// Define interfaces for our data structures
+interface Employee {
+  id: number;
+  name: string;
+  department: string;
+}
+
+interface LeaveType {
+  id: number;
+  name: string;
+  color: string;
+}
+
+interface LeaveRequest {
+  employee: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  type: number | string; // Can be either a number (ID) or string (name)
+}
+
 export default function LeaveCalendarPage() {
   const searchParams = useSearchParams();
   const initialEmployeeId = searchParams.get('employee');
   
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [employees, setEmployees] = useState([]);
-  const [leaveTypes, setLeaveTypes] = useState([]);
-  const [leaveRequests, setLeaveRequests] = useState([]);
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState(initialEmployeeId ? Number(initialEmployeeId) : null);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(initialEmployeeId ? Number(initialEmployeeId) : null);
   const [selectedDepartment, setSelectedDepartment] = useState('all');
-  const [selectedLeaveTypes, setSelectedLeaveTypes] = useState([]);
+  const [selectedLeaveTypes, setSelectedLeaveTypes] = useState<number[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -27,7 +48,7 @@ export default function LeaveCalendarPage() {
     setEmployees(storedEmployees);
     setLeaveTypes(storedLeaveTypes);
     setLeaveRequests(storedLeaveRequests);
-    setSelectedLeaveTypes(storedLeaveTypes.map(type => type.id));
+    setSelectedLeaveTypes(storedLeaveTypes.map((type: LeaveType) => type.id));
     setIsLoading(false);
   }, []);
 
@@ -86,21 +107,21 @@ export default function LeaveCalendarPage() {
     weeks.push(days.slice(i, i + 7));
   }
 
-  const getEmployeeName = (employeeId) => {
+  const getEmployeeName = (employeeId: number): string => {
     const employee = employees.find(e => e.id === employeeId);
     return employee ? employee.name : 'Unknown';
   };
 
-  const getLeaveTypeDetails = (leaveTypeId) => {
+  const getLeaveTypeDetails = (leaveTypeId: number): LeaveType => {
     const leaveType = leaveTypes.find(t => t.id === leaveTypeId);
-    return leaveType || { name: 'Unknown', color: '#cccccc' };
+    return leaveType || { id: 0, name: 'Unknown', color: '#cccccc' };
   };
 
-  const isDateInLeaveRequest = (date, employeeId) => {
+  const isDateInLeaveRequest = (date: Date, employeeId?: number) => {
     // Filter approved leave requests only
     const relevantRequests = leaveRequests.filter(request => 
       request.status === 'approved' && 
-      (selectedLeaveTypes.includes(request.type) || typeof request.type === 'string') &&
+      (selectedLeaveTypes.includes(request.type as number) || typeof request.type === 'string') &&
       (!employeeId || request.employee === getEmployeeName(employeeId))
     );
     
