@@ -21,7 +21,7 @@ const AdminSidebar = () => {
   };
 
   return (
-    <nav className="h-full w-full bg-gray-100 p-4 flex flex-col justify-between">
+    <nav className="h-full w-full bg-[#3089a1] p-4 flex flex-col justify-between">
       <div>
         <h2 className="text-xl font-bold mb-6 text-gray-700">Admin Panel</h2>
         <ul className="space-y-2">

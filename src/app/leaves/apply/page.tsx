@@ -13,6 +13,7 @@ type LeaveApplication = {
   to: string;
   document?: string;
   status: 'pending' | 'approved' | 'rejected';
+  submittedBy: string;
 };
 
 export default function ApplyLeave() {
@@ -33,6 +34,8 @@ export default function ApplyLeave() {
       return;
     }
 
+    const submittedBy = localStorage.getItem('loggedInUser') || 'anonymous';
+
     const newLeave: LeaveApplication = {
       type,
       reason,
@@ -40,6 +43,7 @@ export default function ApplyLeave() {
       to,
       document: document?.name,
       status: 'pending',
+      submittedBy,
     };
 
     const stored = localStorage.getItem('leaveHistory');
