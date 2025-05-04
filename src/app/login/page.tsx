@@ -1,4 +1,5 @@
 
+
 // 'use client';
 
 // import { useRouter } from 'next/navigation';
@@ -22,8 +23,7 @@
 
 //   const handleLogin = () => {
 //     const users = JSON.parse(localStorage.getItem('users') || '[]');
-
-//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    
 //     const matchedUser = users.find(
 //       (user: any) =>
 //         user.email === email && user.password === password && user.role === role
@@ -111,17 +111,22 @@
 //       </div>
 //     </div>
 //   );
-// }
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// } 
 'use client';
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+interface User {
+  email: string;
+  password: string;
+  role: 'employee' | 'manager' | 'admin';
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('employee');
+  const [role, setRole] = useState<'employee' | 'manager' | 'admin'>('employee');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const router = useRouter();
@@ -135,10 +140,10 @@ export default function LoginPage() {
   }, []);
 
   const handleLogin = () => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
+    const users: User[] = JSON.parse(localStorage.getItem('users') || '[]');
+
     const matchedUser = users.find(
-      (user: any) =>
+      (user) =>
         user.email === email && user.password === password && user.role === role
     );
 
@@ -206,7 +211,7 @@ export default function LoginPage() {
           <label className="block mb-1 font-medium">Role</label>
           <select
             value={role}
-            onChange={(e) => setRole(e.target.value)}
+            onChange={(e) => setRole(e.target.value as User['role'])}
             className="w-full border px-3 py-2 rounded outline-[#3089a1]"
           >
             <option value="employee">Employee</option>
