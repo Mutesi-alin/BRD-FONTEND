@@ -47,7 +47,7 @@ export default function SettingsPage() {
 
       <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-6">
         <div className="flex items-start gap-3">
-          <span className="text-2xl">🚧</span>
+          <span className="text-2xl"></span>
           <div>
             <h4 className="text-yellow-900 font-semibold mb-1">Under Development</h4>
             <p className="text-sm text-yellow-800">
