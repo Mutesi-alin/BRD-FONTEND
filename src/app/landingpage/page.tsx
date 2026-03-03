@@ -1,57 +1,188 @@
-'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 
-export default function LandingPage() {
-  const router = useRouter();
 
-  useEffect(() => {
-    const userData = localStorage.getItem('user');
-    try {
-      const user = JSON.parse(userData || '{}');
-      if (user && user.email) {
-        router.push('/dashboard');
-      }
-    } catch {
-      localStorage.removeItem('user');
-    }
-  }, [router]);
+// import Image from "next/image";
+// import Link from "next/link";
 
+// export default function Landingpage() {
+//   return (
+//     <main className="min-h-screen">
+
+//       {/* NAVBAR */}
+//       <nav className="flex items-center justify-between px-12 py-6 bg-white shadow-sm">
+//         <div className="text-2xl font-bold text-green-800">BRD</div>
+
+//         <div className="flex items-center gap-8 text-sm">
+//           <Link href="#" className="text-gray-600 hover:text-green-700 transition">Home</Link>
+//           <Link href="#features" className="text-gray-600 hover:text-green-700 transition">About</Link>
+//           <Link href="#cta" className="text-gray-600 hover:text-green-700 transition">Contact</Link>
+
+//           <Link
+//             href="/login"
+//             className="px-5 py-2 rounded-md bg-green-700 text-white hover:bg-green-600 transition"
+//           >
+//             Login
+//           </Link>
+
+//           <Link
+//             href="/register"
+//             className="px-5 py-2 rounded-md border border-green-700 text-green-700 hover:bg-green-50 transition"
+//           >
+//             Sign Up
+//           </Link>
+//         </div>
+//       </nav>
+
+//       {/* HERO SECTION */}
+//       <section className="relative bg-gradient-to-r from-green-50 to-white px-12 py-20 rounded-b-3xl">
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+
+//           {/* LEFT */}
+//           <div>
+//             <h1 className="text-4xl font-bold text-green-900 leading-tight mb-6">
+//               Welcome to the <br />
+//               Development Finance <br />
+//               Management System
+//             </h1>
+
+//             <p className="text-gray-600 mb-8 max-w-lg">
+//               Securely Manage Rwanda&apos;s Development Financing
+//             </p>
+
+//             <div className="flex items-center gap-4">
+//               <Link
+//                 href="/login"
+//                 className="inline-flex items-center gap-2 px-6 py-3 bg-green-700 text-white rounded-md hover:bg-green-600 transition"
+//               >
+//                 Get Started →
+//               </Link>
+//               <Link
+//                 href="/register"
+//                 className="inline-flex items-center gap-2 px-6 py-3 border border-green-700 text-green-700 rounded-md hover:bg-green-50 transition"
+//               >
+//                 Create Account
+//               </Link>
+//             </div>
+//           </div>
+
+//           <div className="relative">
+//             <Image
+//               src="/images/BRD.jpg"
+//               alt="Finance illustration"
+//               width={500}
+//               height={500}
+//               priority
+//             />
+//           </div>
+//         </div>
+//       </section>
+
+     
+
+
+     
+
+//     </main>
+//   );
+// }
+
+// function FeatureCard({
+//   title,
+//   description,
+//   icon,
+// }: {
+//   title: string;
+//   description: string;
+//   icon: string;
+// }) {
+//   return (
+//     <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
+//       <div className="text-3xl mb-4">{icon}</div>
+//       <h3 className="font-semibold text-lg mb-2">{title}</h3>
+//       <p className="text-gray-600 text-sm">{description}</p>
+//       <Link href="/register" className="mt-3 text-green-700 text-sm inline-block hover:underline">
+//         Learn More →
+//       </Link>
+//     </div>
+//   );
+// }
+
+import Image from "next/image";
+import Link from "next/link";
+
+export default function Landingpage() {
   return (
-    <div className="min-h-screen bg-[#3089a1] flex items-center justify-center p-6">
-      <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-10 max-w-3xl w-full text-center">
-        <div className="flex justify-center mb-6">
-          <Image
-            src="/images/ist_internationl.jpg" // Use the correct path to your image in public/
-            alt="IST Logo"
-            width={140}
-            height={140}
-            className="rounded"
-          />
-        </div>
-        <h1 className="text-4xl md:text-5xl font-bold text-[#3089a1] mb-4">
-          Welcome to the Leave Management System
-        </h1>
-        <p className="text-black text-lg mb-8">
-          Manage leaves, track balances, and keep your team connected—IST style.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
-            onClick={() => router.push('/login')}
-            className="bg-[#3089a1] hover:bg-[#256b7c] transition text-white font-semibold px-8 py-3 rounded-full shadow-lg"
+    <main className="min-h-screen">
+
+      {/* NAVBAR */}
+      <nav className="flex items-center justify-between px-12 py-6 bg-white shadow-sm">
+        <div className="text-2xl font-bold text-green-800">BRD</div>
+
+        <div className="flex items-center gap-8 text-sm">
+          <Link href="#" className="text-gray-600 hover:text-green-700 transition">Home</Link>
+          <Link href="#features" className="text-gray-600 hover:text-green-700 transition">About</Link>
+          <Link href="#cta" className="text-gray-600 hover:text-green-700 transition">Contact</Link>
+
+          <Link
+            href="/login"
+            className="px-5 py-2 rounded-md bg-green-700 text-white hover:bg-green-600 transition"
           >
             Login
-          </button>
-          <button
-            onClick={() => router.push('/signup')}
-            className="bg-white hover:bg-gray-100 transition text-[#3089a1] border border-[#3089a1] font-semibold px-8 py-3 rounded-full shadow-lg"
+          </Link>
+
+          <Link
+            href="/register"
+            className="px-5 py-2 rounded-md border border-green-700 text-green-700 hover:bg-green-50 transition"
           >
             Sign Up
-          </button>
+          </Link>
         </div>
-      </div>
-    </div>
+      </nav>
+
+      {/* HERO SECTION */}
+      <section className="relative bg-gradient-to-r from-green-50 to-white px-12 py-20 rounded-b-3xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+
+          {/* LEFT */}
+          <div>
+            <h1 className="text-4xl font-bold text-green-900 leading-tight mb-6">
+              Welcome to the <br />
+              Development Finance <br />
+              Management System
+            </h1>
+
+            <p className="text-gray-600 mb-8 max-w-lg">
+              Securely Manage Rwanda&apos;s Development Financing
+            </p>
+
+            <div className="flex items-center gap-4">
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-green-700 text-white rounded-md hover:bg-green-600 transition"
+              >
+                Get Started →
+              </Link>
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 px-6 py-3 border border-green-700 text-green-700 rounded-md hover:bg-green-50 transition"
+              >
+                Create Account
+              </Link>
+            </div>
+          </div>
+
+          <div className="relative">
+            <Image
+              src="/images/BRD.jpg"
+              alt="Finance illustration"
+              width={500}
+              height={500}
+              priority
+            />
+          </div>
+        </div>
+      </section>
+
+    </main>
   );
 }

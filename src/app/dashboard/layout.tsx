@@ -1,60 +1,139 @@
-// 'use client';
 
-// import { useEffect, useState } from 'react';
-// import { useRouter } from 'next/navigation';
-// import EmployeeSidebar from '@/app/sidebar'; // because index.tsx is default
 
-// export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-//   const router = useRouter();
-//   const [allowed, setAllowed] = useState(false);
+// 'use client'
+// import { useEffect } from 'react'
+// import { useRouter, usePathname } from 'next/navigation'
+// import { useAuth } from '@/context/AuthContext'
+// import { ClientProvider } from '@/context/ClientContext'
+// import { ProjectProvider } from '@/context/ProjectContext'
+// import Sidebar from '../components/Sidebar'
+
+// export default function DashboardLayout({
+//   children,
+// }: {
+//   children: React.ReactNode
+// }) {
+//   const { user, loading } = useAuth()
+//   const router = useRouter()
+//   const pathname = usePathname()
+
+//   const roleRedirects: Record<string, string> = {
+//     ADMIN: '/dashboard/admin',
+//     LOAN_OFFICER: '/dashboard/loan',
+//     PROJECT_OFFICER: '/dashboard/project',
+//     MANAGEMENT: '/dashboard/management',
+//     FINANCE_OFFICER: '/dashboard/finance',
+//   }
 
 //   useEffect(() => {
-//     const role = localStorage.getItem('role');
-//     if (role === 'employee') {
-//       setAllowed(true);
-//     } else {
-//       router.push('/login'); // or wherever your login page is
+//     if (!loading && !user) {
+//       router.push('/login')
 //     }
-//   }, []);
+//   }, [user, loading, router])
 
-//   if (!allowed) return null;
+//   useEffect(() => {
+//     if (!loading && pathname === '/dashboard' && user?.role) {
+//       const targetPath = roleRedirects[user.role]
+//       if (targetPath) {
+//         router.push(targetPath)
+//       }
+//     }
+//   }, [pathname, user, loading, router])
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center bg-gray-50">
+//         <div className="text-center">
+//           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-700 mx-auto"></div>
+//           <p className="mt-4 text-gray-600 font-medium">Loading...</p>
+//         </div>
+//       </div>
+//     )
+//   }
+
+//   if (!user) {
+//     return null
+//   }
 
 //   return (
-//     <div className="flex min-h-screen">
-//       <aside className="w-64 border-r bg-gray-100">
-//         <EmployeeSidebar />
-//       </aside>
-//       <main className="flex-1 p-6">{children}</main>
-//     </div>
-//   );
+//     <ClientProvider>
+//       <ProjectProvider>
+//         <div className="min-h-screen bg-gray-50">
+//           <Sidebar />
+//           <div className="ml-64">
+//             {children}
+//           </div>
+//         </div>
+//       </ProjectProvider>
+//     </ClientProvider>
+//   )
 // }
-'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import EmployeeSidebar from '@/app/sidebar'; // because index.tsx is default
+'use client'
+import { useEffect, useCallback } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
+import { ClientProvider } from '@/context/ClientContext'
+import { ProjectProvider } from '@/context/ProjectContext'
+import Sidebar from '../components/Sidebar'
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const [allowed, setAllowed] = useState(false);
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const roleRedirects: Record<string, string> = useCallback(() => ({
+    ADMIN: '/dashboard/admin',
+    LOAN_OFFICER: '/dashboard/loan',
+    PROJECT_OFFICER: '/dashboard/project',
+    MANAGEMENT: '/dashboard/management',
+    FINANCE_OFFICER: '/dashboard/finance',
+  }), [])()
 
   useEffect(() => {
-    const role = localStorage.getItem('role');
-    if (role === 'employee') {
-      setAllowed(true);
-    } else {
-      router.push('/login'); // or wherever your login page is
+    if (!loading && !user) {
+      router.push('/login')
     }
-  }, [router]); // ✅ include router
+  }, [user, loading, router])
 
-  if (!allowed) return null;
+  useEffect(() => {
+    if (!loading && pathname === '/dashboard' && user?.role) {
+      const targetPath = roleRedirects[user.role]
+      if (targetPath) {
+        router.push(targetPath)
+      }
+    }
+  }, [pathname, user, loading, router, roleRedirects])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-700 mx-auto"></div>
+          <p className="mt-4 text-gray-600 font-medium">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="w-64 border-r bg-gray-100">
-        <EmployeeSidebar />
-      </aside>
-      <main className="flex-1 p-6">{children}</main>
-    </div>
-  );
-}
+    <ClientProvider>
+      <ProjectProvider>
+        <div className="min-h-screen bg-gray-50">
+          <Sidebar />
+          <div className="ml-64">
+            {children}
+          </div>
+        </div>
+      </ProjectProvider>
+    </ClientProvider>
+  )
+} 

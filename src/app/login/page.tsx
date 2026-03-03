@@ -1,232 +1,157 @@
-
-
-// 'use client';
-
-// import { useRouter } from 'next/navigation';
-// import { useEffect, useState } from 'react';
+// 'use client'
+// import { useState } from 'react'
+// import { useAuth } from '@/context/AuthContext'
 
 // export default function LoginPage() {
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [role, setRole] = useState('employee');
-//   const [error, setError] = useState('');
-//   const [successMessage, setSuccessMessage] = useState('');
-//   const router = useRouter();
+//   const { login } = useAuth()
+//   const [email, setEmail] = useState('')
+//   const [password, setPassword] = useState('')
+//   const [error, setError] = useState('')
+//   const [loading, setLoading] = useState(false)
 
-//   useEffect(() => {
-//     const success = localStorage.getItem('signup-success');
-//     if (success) {
-//       setSuccessMessage('Account created successfully! Please log in.');
-//       localStorage.removeItem('signup-success');
-//     }
-//   }, []);
-
-//   const handleLogin = () => {
-//     const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-//     const matchedUser = users.find(
-//       (user: any) =>
-//         user.email === email && user.password === password && user.role === role
-//     );
-
-//     if (!matchedUser) {
-//       setError('Invalid credentials or role mismatch');
-//       return;
-//     }
-
-//     localStorage.setItem('user', JSON.stringify(matchedUser));
-//     localStorage.setItem('role', role);
-
-//     if (role === 'admin') {
-//       router.push('/admin/dashboard');
-//     } else if (role === 'manager') {
-//       router.push('/manager/LeaveApprovalPanel');
-//     } else {
-//       router.push('/dashboard');
-//     }
-//   };
-
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault()
+//     setError('')
+//     setLoading(true)
+//     const result = await login({ email, password })
+//     if (!result.success) setError(result.error || 'Login failed')
+//     setLoading(false)
+//   }
+// console.log('API URL:', process.env.NEXT_PUBLIC_API_URL)
 //   return (
-//     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-//       <div className="bg-white p-6 rounded shadow max-w-sm w-full">
-//         <h2 className="text-2xl font-bold mb-6 text-center text-[#3089a1]">
-//           Login to Your Account
-//         </h2>
-
-//         {successMessage && (
-//           <div className="bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
-//             {successMessage}
+//     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+//       <div className="w-full max-w-md">
+//         <div className="text-center mb-10">
+//           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500 mb-4">
+//             <span className="text-2xl font-black text-white">B</span>
 //           </div>
-//         )}
-
-//         {error && (
-//           <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
-//             {error}
-//           </div>
-//         )}
-
-//         <div className="mb-4">
-//           <label className="block mb-1 font-medium">Email</label>
-//           <input
-//             type="email"
-//             required
-//             value={email}
-//             onChange={(e) => setEmail(e.target.value)}
-//             className="w-full border px-3 py-2 rounded outline-[#3089a1]"
-//             placeholder="john@example.com"
-//           />
+//           <h1 className="text-3xl font-bold text-white">BRD Project</h1>
+//           <p className="text-slate-400 mt-1">Sign in to your account</p>
 //         </div>
-
-//         <div className="mb-4">
-//           <label className="block mb-1 font-medium">Password</label>
-//           <input
-//             type="password"
-//             required
-//             value={password}
-//             onChange={(e) => setPassword(e.target.value)}
-//             className="w-full border px-3 py-2 rounded outline-[#3089a1]"
-//             placeholder="Enter your password"
-//           />
+//         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8">
+//           {error && (
+//             <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+//               {error}
+//             </div>
+//           )}
+//           <form onSubmit={handleSubmit} className="space-y-5">
+//             <div>
+//               <label className="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
+//               <input
+//                 type="email"
+//                 required
+//                 value={email}
+//                 onChange={(e) => setEmail(e.target.value)}
+//                 className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
+//                 placeholder="you@example.com"
+//               />
+//             </div>
+//             <div>
+//               <label className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+//               <input
+//                 type="password"
+//                 required
+//                 value={password}
+//                 onChange={(e) => setPassword(e.target.value)}
+//                 className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
+//                 placeholder="••••••••"
+//               />
+//             </div>
+//             <button
+//               type="submit"
+//               disabled={loading}
+//               className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-white font-semibold rounded-xl transition"
+//             >
+//               {loading ? 'Signing in...' : 'Sign In'}
+//             </button>
+//           </form>
+//           <p className="mt-6 text-center text-slate-400 text-sm">
+//             Don't have an account?{' '}
+//             <a href="/register" className="text-emerald-400 hover:text-emerald-300 font-medium">
+//               Create one
+//             </a>
+//           </p>
 //         </div>
-
-//         <div className="mb-6">
-//           <label className="block mb-1 font-medium">Role</label>
-//           <select
-//             value={role}
-//             onChange={(e) => setRole(e.target.value)}
-//             className="w-full border px-3 py-2 rounded outline-[#3089a1]"
-//           >
-//             <option value="employee">Employee</option>
-//             <option value="manager">Manager</option>
-//             <option value="admin">Admin</option>
-//           </select>
-//         </div>
-
-//         <button
-//           onClick={handleLogin}
-//           className="w-full bg-[#3089a1] hover:bg-[#266e83] text-white font-semibold py-2 rounded"
-//         >
-//           Login
-//         </button>
 //       </div>
 //     </div>
-//   );
-// } 
-'use client';
+//   )
+// }
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-
-interface User {
-  email: string;
-  password: string;
-  role: 'employee' | 'manager' | 'admin';
-}
+'use client'
+import { useState } from 'react'
+import { useAuth } from '@/context/AuthContext'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'employee' | 'manager' | 'admin'>('employee');
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const router = useRouter();
+  const { login } = useAuth()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    const success = localStorage.getItem('signup-success');
-    if (success) {
-      setSuccessMessage('Account created successfully! Please log in.');
-      localStorage.removeItem('signup-success');
-    }
-  }, []);
-
-  const handleLogin = () => {
-    const users: User[] = JSON.parse(localStorage.getItem('users') || '[]');
-
-    const matchedUser = users.find(
-      (user) =>
-        user.email === email && user.password === password && user.role === role
-    );
-
-    if (!matchedUser) {
-      setError('Invalid credentials or role mismatch');
-      return;
-    }
-
-    localStorage.setItem('user', JSON.stringify(matchedUser));
-    localStorage.setItem('role', role);
-
-    if (role === 'admin') {
-      router.push('/admin/dashboard');
-    } else if (role === 'manager') {
-      router.push('/manager/LeaveApprovalPanel');
-    } else {
-      router.push('/dashboard');
-    }
-  };
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    const result = await login({ email, password })
+    if (!result.success) setError(result.error || 'Login failed')
+    setLoading(false)
+  }
+console.log('API URL:', process.env.NEXT_PUBLIC_API_URL)
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white p-6 rounded shadow max-w-sm w-full">
-        <h2 className="text-2xl font-bold mb-6 text-center text-[#3089a1]">
-          Login to Your Account
-        </h2>
-
-        {successMessage && (
-          <div className="bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
-            {successMessage}
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500 mb-4">
+            <span className="text-2xl font-black text-white">B</span>
           </div>
-        )}
-
-        {error && (
-          <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
-            {error}
-          </div>
-        )}
-
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Email</label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border px-3 py-2 rounded outline-[#3089a1]"
-            placeholder="john@example.com"
-          />
+          <h1 className="text-3xl font-bold text-white">BRD Project</h1>
+          <p className="text-slate-400 mt-1">Sign in to your account</p>
         </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Password</label>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border px-3 py-2 rounded outline-[#3089a1]"
-            placeholder="Enter your password"
-          />
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8">
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
+                placeholder="you@example.com"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
+                placeholder="••••••••"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-white font-semibold rounded-xl transition"
+            >
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+          <p className="mt-6 text-center text-slate-400 text-sm">
+            Don&apos;t have an account?{' '}
+            <a href="/register" className="text-emerald-400 hover:text-emerald-300 font-medium">
+              Create one
+            </a>
+          </p>
         </div>
-
-        <div className="mb-6">
-          <label className="block mb-1 font-medium">Role</label>
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value as User['role'])}
-            className="w-full border px-3 py-2 rounded outline-[#3089a1]"
-          >
-            <option value="employee">Employee</option>
-            <option value="manager">Manager</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-
-        <button
-          onClick={handleLogin}
-          className="w-full bg-[#3089a1] hover:bg-[#266e83] text-white font-semibold py-2 rounded"
-        >
-          Login
-        </button>
       </div>
     </div>
-  );
+  )
 }
